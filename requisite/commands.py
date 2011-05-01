@@ -1,7 +1,8 @@
 import sys, os
 from pip.commands.install import InstallCommand
 from pip.index import PackageFinder
-from pip.req import InstallRequirement, RequirementSet, parse_requirements
+from pip.req import (InstallRequirement, RequirementSet, parse_requirements,
+                     PIP_DELETE_MARKER_FILENAME)
 from pip.log import logger
 from pip import call_subprocess
 
@@ -9,6 +10,7 @@ class Requisite(InstallCommand):
   name = 'requisite'
   usage = '%prog [OPTIONS]'
   summary = 'Uploads required packages to a PyPI server'
+  _ignore = [PIP_DELETE_MARKER_FILENAME]
   
   def __init__(self):
     super(Requisite, self).__init__()
@@ -38,13 +40,28 @@ class Requisite(InstallCommand):
   def _build_package_finder(self, options, index_urls):
     return PackageFinder(find_links=options.find_links, index_urls=index_urls)
   
-  def _individual_packages(self):
-    return []
+  def _individual_packages(self, options):
+    c_dir = os.path.abspath(options.req_cache_dir)
+    for n in os.listdir(c_dir):
+      if n not in self._ignore:
+        yield os.path.join(c_dir, n)
   
-  def _upload_to_repository(self):
-    pass
+  def upload_to_repository(self, options):
+    opts = ['sdist', 'register', '-r', options.req_repository, 
+            'upload', '-r', options.req_repository]
+    setup = ' '.join(['setup.py'] + opts)
+    logger.notify('Running %s for packages in %s' % (setup, options.req_cache_dir))
+    pkgs = self._individual_packages(options)
+    logger.indent += 2
+    for n in pkgs:
+      call_subprocess([sys.executable, os.path.join(n, 'setup.py')] + opts)
+    logger.indent -= 2
   
   def run(self, options, args):
+    if not options.req_repository:
+      logger.notify('You need to specify a repository. This utility '
+                    'does not upload to PyPI')
+      return 1
     options.build_dir = os.path.abspath(options.req_cache_dir)
     options.src_dir = os.path.abspath(options.req_cache_dir)
     options.no_install = True
@@ -68,16 +85,18 @@ class Requisite(InstallCommand):
     
     for filename in options.requirements:
       for req in parse_requirements(filename, finder=finder, options=options):
-        print 'req', req
+        logger.info('req ' + str(req))
         requirement_set.add_requirement(req)
 
     if not options.no_download:
-      requirement_set.prepare_files(finder, force_root_egg_info=self.bundle, bundle=self.bundle)
+      requirement_set.prepare_files(finder, force_root_egg_info=False, bundle=False)
     else:
       requirement_set.locate_files()
     
     if options.req_clean_cache:
       requirement_set.cleanup_files(bundle=False)
+    
+    self.upload_to_repository(options)
     
     return requirement_set
 
