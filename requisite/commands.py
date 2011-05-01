@@ -47,6 +47,7 @@ class Requisite(InstallCommand):
         yield os.path.join(c_dir, n)
   
   def upload_to_repository(self, options):
+    current = os.path.abspath(os.curdir)
     opts = ['sdist', 'register', '-r', options.req_repository, 
             'upload', '-r', options.req_repository]
     setup = ' '.join(['setup.py'] + opts)
@@ -54,7 +55,9 @@ class Requisite(InstallCommand):
     pkgs = self._individual_packages(options)
     logger.indent += 2
     for n in pkgs:
-      call_subprocess([sys.executable, os.path.join(n, 'setup.py')] + opts)
+      os.chdir(n)
+      call_subprocess([sys.executable, 'setup.py'] + opts)
+    os.chdir(current)
     logger.indent -= 2
   
   def run(self, options, args):
