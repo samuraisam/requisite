@@ -1,3 +1,4 @@
 req_cache
 *.pyc
 *.DS_Store
+stabby.txt
