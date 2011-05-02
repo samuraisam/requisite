@@ -12,7 +12,8 @@ that have allowed us to develop and share a wide breadth of software projects.
 
 [PyPI](http://pypi.python.org) among various social coding sites are the preferred way
 to distribute your project to a wider audience and for that they work great. However
-when it's time to deploy your application to servers, depending on them would be a huge misstep.
+when it's time to deploy your application to servers, depending on those would be a
+a huge mistake. We've all done it, and sometimes the ramifications can be pretty painful.
 Without knowing the uptime of PyPI or github, for example--it's not enough. Not
 only that but the project could disappear, be moved or be changed in some way that
 causes incompatability to your application.
