@@ -19,5 +19,6 @@ setup(name='requisite',
       url='http://github.com/samuraisam/requisite',
       license='MIT',
       packages=['requisite','requisite.scripts'],
+      install_requires=['pip']
       entry_points=dict(console_scripts=['req=requisite:main', 'req-%s=requisite:main' % sys.version[:3]]),
       zip_safe=False)
