@@ -1,3 +1,5 @@
+#Requisite
+
 Developing modern web applications often requires relying on a potentially very
 large suite of 3rd party components. Dependency management for such applications
 is a notorously agrivating experience.
@@ -55,7 +57,7 @@ frozen pip requirements file:
     $ req requisite -r frozen-requirements.txt --repository=my_chishop --clean-cache
 
 That's it. In your deploys you can use this new repository by specifying an 
-(`--index-url`)[http://www.pip-installer.org/en/latest/requirement-format.html]
-at the top of your `frozen-requirements.txt` file. pip will then favor that server when
-installing your app.
+`--index-url` (see here)[http://www.pip-installer.org/en/latest/requirement-format.html]
+at the top of your `frozen-requirements.txt` file. pip will then use that server to download
+dependencies.
 
