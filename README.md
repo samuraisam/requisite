@@ -57,7 +57,7 @@ frozen pip requirements file:
     $ req requisite -r frozen-requirements.txt --repository=my_chishop --clean-cache
 
 That's it. In your deploys you can use this new repository by specifying an 
-`--index-url` (see here)[http://www.pip-installer.org/en/latest/requirement-format.html]
+`--index-url` [see here](http://www.pip-installer.org/en/latest/requirement-format.html)
 at the top of your `frozen-requirements.txt` file. pip will then use that server to download
 dependencies.
 
