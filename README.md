@@ -62,3 +62,9 @@ That's it. In your deploys you can use this new repository by specifying an
 at the top of your `frozen-requirements.txt` file. pip will then use that server to download
 dependencies.
 
+###A word to the wise
+Do note that when using this method of dependency management, it's advisible that you
+take reasonable security precautions. If you happen to be using Chishop and Requisite 
+on ep.io, your data will be on the public internet. Be sure to **abstain from including
+sensitive data** in your python packages. Chishop could also use some help implementing
+a more secure mode of operation. Even then, be wary.
