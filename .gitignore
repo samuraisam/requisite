@@ -4,3 +4,4 @@ req_cache
 stabby.txt
 dist/
 requisite.egg-info/
+build/
