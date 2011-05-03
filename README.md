@@ -60,7 +60,8 @@ frozen pip requirements file:
 That's it. In your deploys you can use this new repository by specifying an 
 `--index-url` [see here](http://www.pip-installer.org/en/latest/requirement-format.html)
 at the top of your `frozen-requirements.txt` file. pip will then use that server to download
-dependencies.
+dependencies. In fact, it will actually create one of these for you and dumped into your
+current directory named `req-requirements.txt` with all editable packages solidified.
 
 ###A word to the wise
 Do note that when using this method of dependency management, it's advisable that you

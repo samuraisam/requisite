@@ -19,23 +19,33 @@ class Requisite(InstallCommand):
       dest='req_cache_dir',
       default='req_cache',
       metavar='DIR',
-      help='Download and extract all packages here'
-    )
+      help='Download and extract all packages into a cache directory '
+           'it can stick around if that is useful.')
     self.parser.add_option(
       '--repository',
       dest='req_repository',
       default=None,
       metavar='URL',
-      help='Upload to this PyPI repository'
-    )
+      help='Upload to this PyPI repository')
     self.parser.add_option(
       '--clean-cache',
       dest='req_clean_cache',
       default=False,
       action='store_true',
-      help='Whether or not to save cache files '
-           '(it will be faster to save these)'
-    )
+      help='Clear cache files after complete operation')
+    self.parser.add_option(
+      '--req-requirements',
+      dest='req_req_requirements',
+      default='req-requirements.txt',
+      help='File where all the new requirements will be written (this is useful'
+      ' because it removes all dependencies on git, since you no longer use it)')
+    self.parser.add_option(
+      '--no-upload',
+      dest='req_no_upload',
+      default=False,
+      action='store_true',
+      help='Will preform all actions without uploading')
+  
   
   def _build_package_finder(self, options, index_urls):
     return PackageFinder(find_links=options.find_links, index_urls=index_urls)
@@ -45,6 +55,14 @@ class Requisite(InstallCommand):
     for n in os.listdir(c_dir):
       if n not in self._ignore:
         yield os.path.join(c_dir, n)
+  
+  def repository_url(self, options):
+    if not getattr(self, '_repo_url', None):
+      from ConfigParser import ConfigParser
+      y = ConfigParser()
+      y.read(os.path.expanduser('~/.pypirc'))
+      setattr(self, '_repo_url', y.get(options.req_repository, 'repository'))
+    return self._repo_url
   
   def upload_to_repository(self, options):
     current = os.path.abspath(os.curdir)
@@ -86,10 +104,17 @@ class Requisite(InstallCommand):
                                      ignore_installed=options.ignore_installed,
                                      ignore_dependencies=options.ignore_dependencies)
     
-    for filename in options.requirements:
-      for req in parse_requirements(filename, finder=finder, options=options):
-        logger.info('req ' + str(req))
-        requirement_set.add_requirement(req)
+    req_req = open(os.path.abspath(options.req_req_requirements), 'w')
+    req_req.writelines(['--index-url=%s' % self.repository_url(options), '\n'])
+    
+    try:
+      for filename in options.requirements:
+        for req in parse_requirements(filename, finder=finder, options=options):
+          logger.info('req ' + str(req.req))
+          req_req.writelines([str(req.req), '\n'])
+          requirement_set.add_requirement(req)
+    finally:
+      req_req.close()
 
     if not options.no_download:
       requirement_set.prepare_files(finder, force_root_egg_info=False, bundle=False)
@@ -99,7 +124,8 @@ class Requisite(InstallCommand):
     if not os.path.exists(os.path.abspath(options.req_cache_dir)):
       os.mkdir(os.path.abspath(options.req_cache_dir))
     
-    self.upload_to_repository(options)
+    if not options.req_no_upload:
+      self.upload_to_repository(options)
     
     if options.req_clean_cache:
       requirement_set.cleanup_files(bundle=False)
