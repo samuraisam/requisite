@@ -25,8 +25,8 @@ class Requisite(InstallCommand):
       '--repository',
       dest='req_repository',
       default=None,
-      metavar='URL',
-      help='Upload to this PyPI repository')
+      metavar='NAME',
+      help='Upload to this PyPI repository (it must be present in your ~/.pypirc file)')
     self.parser.add_option(
       '--clean-cache',
       dest='req_clean_cache',
