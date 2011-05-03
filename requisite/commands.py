@@ -96,10 +96,13 @@ class Requisite(InstallCommand):
     else:
       requirement_set.locate_files()
     
-    if options.req_clean_cache:
-      requirement_set.cleanup_files(bundle=False)
+    if not os.path.exists(os.path.abspath(options.req_cache_dir)):
+      os.mkdir(os.path.abspath(options.req_cache_dir))
     
     self.upload_to_repository(options)
+    
+    if options.req_clean_cache:
+      requirement_set.cleanup_files(bundle=False)
     
     return requirement_set
 

@@ -1,7 +1,7 @@
 import sys, os
 from setuptools import setup
 
-version = "0.1"
+version = "0.1.1"
 
 setup(name='requisite',
       version=version,
