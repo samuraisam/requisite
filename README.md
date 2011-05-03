@@ -63,7 +63,7 @@ at the top of your `frozen-requirements.txt` file. pip will then use that server
 dependencies.
 
 ###A word to the wise
-Do note that when using this method of dependency management, it's advisible that you
+Do note that when using this method of dependency management, it's advisable that you
 take reasonable security precautions. If you happen to be using Chishop and Requisite 
 on ep.io, your data will be on the public internet. Be sure to **abstain from including
 sensitive data** in your python packages. Chishop could also use some help implementing
